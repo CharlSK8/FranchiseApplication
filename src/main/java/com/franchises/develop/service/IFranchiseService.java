@@ -15,5 +15,6 @@ public interface IFranchiseService {
     Mono<ResponseDTO<Franchise>> createFranchise(FranchiseRequestDTO franchiseRequestDTO);
     Mono<ResponseDTO<Franchise>> updateFranchiseName(FranchiseUpdateNameRequestDTO franchiseUpdateNameRequestDTO);
     Mono<ResponseDTO<Franchise>> addBranch(String franchiseId, BranchDTO branchDTO);
+    Mono<ResponseDTO<Franchise>> updateBranchName(String franchiseId, BranchUpdateNameRequestDTO branchUpdateNameRequestDTO);
     Mono<ResponseDTO<List<ProductWithBranchDTO>>> getProductsWithMaxStockByBranch(String franchiseId);
 }
