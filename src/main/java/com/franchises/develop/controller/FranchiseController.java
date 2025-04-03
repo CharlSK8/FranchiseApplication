@@ -42,6 +42,23 @@ public class FranchiseController {
                         .status(responseDTO.getCode())
                         .body(responseDTO));
     }
+
+    /**
+     * Updates the name of an existing franchise.
+     *
+     * @param franchiseUpdateNameRequestDTO The request body containing the franchise ID and the new name.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing the updated franchise details
+     *         or an error response if the operation fails.
+     */
+    @PatchMapping("/update")
+    @Operation(summary = "Update franchise name", description = "Creates a new franchise with the provided details")
+    public Mono<ResponseEntity<Object>> updateFranchise(@Valid @RequestBody FranchiseUpdateNameRequestDTO franchiseUpdateNameRequestDTO) {
+        return franchiseService.updateFranchiseName(franchiseUpdateNameRequestDTO)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
+
     /**
      * Adds a new branch to a specific franchise.
      *
