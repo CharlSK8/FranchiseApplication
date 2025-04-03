@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 
 public interface IBranchService {
     Mono<ResponseDTO<Branch>> addProductToBranch(String branchId, ProductRequestDTO productRequest);
+    Mono<ResponseDTO<Branch>> removeProductFromBranch(String branchId, String productId);
 }
