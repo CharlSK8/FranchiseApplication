@@ -56,6 +56,33 @@ public class FranchiseServiceImpl implements IFranchiseService {
                 });
 
     }
+
+    /**
+     * Updates the name of an existing franchise.
+     *
+     * @param franchiseUpdateNameRequestDTO The request containing the franchise ID and the new name.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated franchise details
+     *         or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Franchise>> updateFranchiseName(FranchiseUpdateNameRequestDTO franchiseUpdateNameRequestDTO) {
+        return franchiseRepository.existsByName(franchiseUpdateNameRequestDTO.getName())
+                .flatMap(nameExists -> {
+                    if (nameExists) {
+                        return Mono.just(buildResponse(HttpStatus.CONFLICT, Constants.FRANCHISE_ALREADY_EXISTS, null));
+                    }
+                    return franchiseRepository.findById(franchiseUpdateNameRequestDTO.getId())
+                            .switchIfEmpty(Mono.error(new ResourceNotFoundException(franchiseUpdateNameRequestDTO.getId())))
+                            .flatMap(existingFranchise -> {
+                                existingFranchise.setName(franchiseUpdateNameRequestDTO.getName());
+                                return franchiseRepository.save(existingFranchise)
+                                        .thenReturn(existingFranchise);
+                            })
+                            .map(updatedFranchise -> buildResponse(HttpStatus.OK, Constants.FRANCHISE_NAME_UPDATED, updatedFranchise))
+                            .onErrorResume(ErrorHandlerUtils::handleError);
+                });
+    }
+
     /**
      * Adds a new branch to a franchise.
      *
