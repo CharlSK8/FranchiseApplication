@@ -55,4 +55,20 @@ public class BranchServiceImpl implements IBranchService {
                 )
                 .onErrorResume(ErrorHandlerUtils::handleError);
     }
+    /**
+     * Builds a standardized response object.
+     *
+     * @param status  The HTTP status of the response.
+     * @param message A descriptive message about the response.
+     * @param data    The response payload containing the requested data.
+     * @param <T>     The type of the response data.
+     * @return A {@link ResponseDTO} containing the provided status, message, and data.
+     */
+    private <T> ResponseDTO<T> buildResponse(HttpStatus status, String message, T data) {
+        return ResponseDTO.<T>builder()
+                .code(status.value())
+                .message(message)
+                .response(data)
+                .build();
+    }
 }
