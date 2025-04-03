@@ -39,4 +39,22 @@ public class BranchController {
                         .body(responseDTO));
 
     }
+
+    /**
+     * Removes a product from a specific branch.
+     *
+     * @param branchId  The unique identifier of the branch from which the product will be removed.
+     * @param productId The unique identifier of the product to be removed.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing a {@link ResponseDTO}
+     *         with the updated branch information or an error response if the operation fails.
+     */
+    @DeleteMapping("/{branchId}/products/{productId}")
+    @Operation(summary = "Remove a product from a branch", description = "Removes a product from a branch if it exists.")
+    public Mono<ResponseEntity<ResponseDTO<Branch>>> removeProductFromBranch(@PathVariable String branchId,
+                                                                            @PathVariable String productId) {
+        return branchService.removeProductFromBranch(branchId, productId)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
 }
