@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface IFranchiseService {
     Mono<ResponseDTO<Franchise>> createFranchise(FranchiseRequestDTO franchiseRequestDTO);
+    Mono<ResponseDTO<Franchise>> updateFranchiseName(FranchiseUpdateNameRequestDTO franchiseUpdateNameRequestDTO);
     Mono<ResponseDTO<Franchise>> addBranch(String franchiseId, BranchDTO branchDTO);
     Mono<ResponseDTO<List<ProductWithBranchDTO>>> getProductsWithMaxStockByBranch(String franchiseId);
 }
