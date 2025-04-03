@@ -30,6 +30,9 @@ import java.util.List;
 @AllArgsConstructor
 public class FranchiseServiceImpl implements IFranchiseService {
     private final FranchiseRepository franchiseRepository;
+    private final BranchRepository branchRepository;
+    private final IFranchiseMapper franchiseMapper;
+    private final IBrancheMapper branchMapper;
     /**
      * Creates a new franchise.
      *
@@ -50,5 +53,45 @@ public class FranchiseServiceImpl implements IFranchiseService {
                     }
                 });
 
+    }
+    /**
+     * Adds a new branch to a franchise.
+     *
+     * @param franchiseId The unique identifier of the franchise to which the branch will be added.
+     * @param branchDTO   The request containing the details of the branch to be created.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated franchise details
+     *         with the newly added branch, or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Franchise>> addBranch(String franchiseId, BranchDTO branchDTO) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException(franchiseId)))
+                .flatMap(franchise ->
+                        branchRepository.save(branchMapper.toBranch(branchDTO))
+                                .map(savedBranch -> {
+                                    franchise.getBranchIds().add(savedBranch.getId());
+                                    return franchise;
+                                })
+                                .flatMap(franchiseRepository::save)
+                )
+                .map(updatedFranchise -> buildResponse(HttpStatus.CREATED, Constants.BRANCH_CREATED_SUCCESSFULLY, updatedFranchise))
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
+
+    /**
+     * Builds a ResponseDTO object with the provided HTTP status, message, and data.
+     *
+     * @param <T>     The data type of the ResponseDTO object.
+     * @param status  The HTTP status of the response.
+     * @param message The message of the response.
+     * @param data    The data of the response.
+     * @return A ResponseDTO object with the provided data.
+     */
+    private <T> ResponseDTO<T> buildResponse(HttpStatus status, String message, T data) {
+        return ResponseDTO.<T>builder()
+                .code(status.value())
+                .message(message)
+                .response(data)
+                .build();
     }
 }

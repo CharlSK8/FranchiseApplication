@@ -13,4 +13,5 @@ import java.util.List;
 
 public interface IFranchiseService {
     Mono<ResponseDTO<Franchise>> createFranchise(FranchiseRequestDTO franchiseRequestDTO);
+    Mono<ResponseDTO<Franchise>> addBranch(String franchiseId, BranchDTO branchDTO);
 }

@@ -42,4 +42,22 @@ public class FranchiseController {
                         .status(responseDTO.getCode())
                         .body(responseDTO));
     }
+    /**
+     * Adds a new branch to a specific franchise.
+     *
+     * @param franchiseId      The unique identifier of the franchise to which the branch will be added.
+     * @param branchRequestDTO The request body containing the details of the branch to be added.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing a {@link ResponseDTO}
+     *         with the updated franchise details or an error response if the operation fails.
+     */
+    @PostMapping("/{franchiseId}/branches")
+    @Operation(summary = "Adds a new branch to a specific franchise",
+            description = "Adds a new branch to an existing franchise based on the provided franchise ID.")
+    public Mono<ResponseEntity<ResponseDTO<Franchise>>> addBranchToFranchise(@PathVariable String franchiseId,
+                                                                @RequestBody @Valid BranchDTO branchRequestDTO) {
+        return franchiseService.addBranch(franchiseId, branchRequestDTO)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
 }
