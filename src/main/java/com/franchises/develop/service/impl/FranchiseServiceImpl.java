@@ -77,4 +77,21 @@ public class FranchiseServiceImpl implements IFranchiseService {
                 .map(updatedFranchise -> buildResponse(HttpStatus.CREATED, Constants.BRANCH_CREATED_SUCCESSFULLY, updatedFranchise))
                 .onErrorResume(ErrorHandlerUtils::handleError);
     }
+
+    /**
+     * Builds a ResponseDTO object with the provided HTTP status, message, and data.
+     *
+     * @param <T>     The data type of the ResponseDTO object.
+     * @param status  The HTTP status of the response.
+     * @param message The message of the response.
+     * @param data    The data of the response.
+     * @return A ResponseDTO object with the provided data.
+     */
+    private <T> ResponseDTO<T> buildResponse(HttpStatus status, String message, T data) {
+        return ResponseDTO.<T>builder()
+                .code(status.value())
+                .message(message)
+                .response(data)
+                .build();
+    }
 }
