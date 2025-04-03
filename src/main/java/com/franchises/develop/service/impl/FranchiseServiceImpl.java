@@ -79,6 +79,24 @@ public class FranchiseServiceImpl implements IFranchiseService {
     }
 
     /**
+    /**
+     * Retrieves the products with the highest stock for each branch within a franchise.
+     *
+     * @param franchiseId The unique identifier of the franchise.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing a list of {@link ProductWithBranchDTO}
+     *         representing the products with the highest stock in each branch, or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<List<ProductWithBranchDTO>>> getProductsWithMaxStockByBranch(String franchiseId) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new BranchNotFoundException(franchiseId)))
+                .flatMapMany(franchise -> Flux.fromIterable(franchise.getBranchIds()))
+                .flatMap(branchId -> getProductWithMaxStock(branchId)
+                        .map(product -> new ProductWithBranchDTO(product, branchId)))
+                .collectList()
+                .map(products -> buildResponse(HttpStatus.OK, Constants.PRODUCTS_WITH_HIGHEST_STOCK_PER_BRANCH, products))
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
      * Builds a ResponseDTO object with the provided HTTP status, message, and data.
      *
      * @param <T>     The data type of the ResponseDTO object.
