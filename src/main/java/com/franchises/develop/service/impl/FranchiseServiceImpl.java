@@ -33,6 +33,8 @@ public class FranchiseServiceImpl implements IFranchiseService {
     private final BranchRepository branchRepository;
     private final IFranchiseMapper franchiseMapper;
     private final IBrancheMapper branchMapper;
+    private final ProductRepository productRepository;
+
     /**
      * Creates a new franchise.
      *
@@ -97,6 +99,23 @@ public class FranchiseServiceImpl implements IFranchiseService {
                 .map(products -> buildResponse(HttpStatus.OK, Constants.PRODUCTS_WITH_HIGHEST_STOCK_PER_BRANCH, products))
                 .onErrorResume(ErrorHandlerUtils::handleError);
     }
+
+    /**
+     * Retrieves the product with the highest stock in a given branch.
+     *
+     * @param sucursalId The unique identifier of the branch.
+     * @return A {@link Mono} emitting the {@link Product} with the highest stock in the specified branch,
+     *         or an empty {@link Mono} if no product is found.
+     */
+    private Mono<Product> getProductWithMaxStock(String sucursalId) {
+        return branchRepository.findById(sucursalId)
+                .flatMapMany(sucursal -> Flux.fromIterable(sucursal.getProductsId()))
+                .flatMap(productRepository::findById)
+                .sort(Comparator.comparingInt(Product::getStock).reversed())
+                .next();
+    }
+
+    /**
      * Builds a ResponseDTO object with the provided HTTP status, message, and data.
      *
      * @param <T>     The data type of the ResponseDTO object.
