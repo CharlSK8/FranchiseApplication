@@ -57,4 +57,25 @@ public class BranchController {
                         .status(responseDTO.getCode())
                         .body(responseDTO));
     }
+
+    /**
+     * Updates the stock quantity of a specific product in a given branch.
+     *
+     * @param branchId  The unique identifier of the branch where the product stock will be updated.
+     * @param productId The unique identifier of the product whose stock will be modified.
+     * @param newStock  The new stock quantity to be set for the product.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing a {@link ResponseDTO}
+     *         with the updated product information or an error response if the operation fails.
+     */
+    @PutMapping("/{branchId}/products/{productId}/stock")
+    @Operation(summary = "Update product stock", description = "Updates the stock of a product in a branch.")
+    public Mono<ResponseEntity<ResponseDTO<Product>>> updateProductStock(@PathVariable String branchId,
+                                                        @PathVariable String productId,
+                                                        @RequestParam int newStock) {
+        return branchService.updateProductStock(branchId, productId, newStock)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
+
 }
