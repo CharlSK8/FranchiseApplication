@@ -29,4 +29,19 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class FranchiseServiceImpl implements IFranchiseService {
+    private final FranchiseRepository franchiseRepository;
+    @Override
+    public Mono<ResponseDTO<Franchise>> createFranchise(FranchiseRequestDTO franchiseRequestDTO) {
+        return franchiseRepository.existsByName(franchiseRequestDTO.getName())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.just(buildResponse(HttpStatus.CONFLICT, Constants.FRANCHISE_ALREADY_EXISTS, null));
+                    } else {
+                        return franchiseRepository.save(franchiseMapper.toFranchise(franchiseRequestDTO))
+                                .map(savedFranchise ->buildResponse(HttpStatus.CREATED, Constants.MESSAGE_CREATED_FRANCHISE, savedFranchise))
+                                .onErrorResume(ErrorHandlerUtils::handleError);
+                    }
+                });
+
+    }
 }
