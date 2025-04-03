@@ -17,4 +17,34 @@ import reactor.core.publisher.Mono;
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements IProductService {
+
+    private final ProductRepository productRepository;
+
+    /**
+     * Updates the name of a specific product.
+     *
+     * @param productId The unique identifier of the product to be updated.
+     * @param newName   The new name to be assigned to the product.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated product details
+     *         or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Product>> updateProductName(String productId, String newName) {
+        return productRepository.findById(productId)
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
+                .flatMap(product -> {
+                    if (product.getName().equalsIgnoreCase(newName)) {
+                        return Mono.error(new ProductNameAlreadyUpToDateException(productId, newName));
+                    }
+                    return productRepository.findByNameIgnoreCase(newName)
+                            .flatMap(existingProduct -> Mono.error(new ProductAlreadyExistsException(newName)))
+                            .switchIfEmpty(Mono.defer(() -> {
+                                product.setName(newName);
+                                return productRepository.save(product);
+                            }))
+                            .thenReturn(product);
+                })
+                .map(updatedProduct -> buildResponse(HttpStatus.OK, Constants.PRODUCT_NAME_UPDATED_SUCCESSFULLY, updatedProduct))
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
 }
