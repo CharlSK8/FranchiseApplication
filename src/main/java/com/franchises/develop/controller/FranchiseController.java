@@ -24,4 +24,22 @@ import java.util.List;
 @RequestMapping("api/v1/franchises")
 @Tag(name = "Franchise Controller", description = "Endpoints for managing franchises")
 public class FranchiseController {
+
+    private final IFranchiseService franchiseService;
+
+    /**
+     * Creates a new franchise.
+     *
+     * @param franchiseRequestDTO The request body containing the details of the franchise to be created.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing the created franchise details
+     *         or an error response if the operation fails.
+     */
+    @PostMapping("/create")
+    @Operation(summary = "Create a new franchise", description = "Creates a new franchise with the provided details")
+    public Mono<ResponseEntity<Object>> createFranchise(@Valid @RequestBody FranchiseRequestDTO franchiseRequestDTO) {
+        return franchiseService.createFranchise(franchiseRequestDTO)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
 }
