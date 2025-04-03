@@ -30,6 +30,13 @@ import java.util.List;
 @AllArgsConstructor
 public class FranchiseServiceImpl implements IFranchiseService {
     private final FranchiseRepository franchiseRepository;
+    /**
+     * Creates a new franchise.
+     *
+     * @param franchiseRequestDTO The request containing the details of the franchise to be created.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the created franchise details
+     *         or an error response if the operation fails.
+     */
     @Override
     public Mono<ResponseDTO<Franchise>> createFranchise(FranchiseRequestDTO franchiseRequestDTO) {
         return franchiseRepository.existsByName(franchiseRequestDTO.getName())
