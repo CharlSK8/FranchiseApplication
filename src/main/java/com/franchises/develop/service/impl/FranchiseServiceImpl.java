@@ -97,12 +97,16 @@ public class FranchiseServiceImpl implements IFranchiseService {
         return franchiseRepository.findById(franchiseId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException(franchiseId)))
                 .flatMap(franchise ->
-                        branchRepository.save(branchMapper.toBranch(branchDTO))
-                                .map(savedBranch -> {
-                                    franchise.getBranchIds().add(savedBranch.getId());
-                                    return franchise;
-                                })
-                                .flatMap(franchiseRepository::save)
+                        branchRepository.findByName(branchDTO.getName())
+                                .flatMap(existingBranch -> Mono.error(new BranchNameAlreadyExistsException(branchDTO.getName())))
+                                .switchIfEmpty(
+                                        branchRepository.save(branchMapper.toBranch(branchDTO))
+                                                .map(savedBranch -> {
+                                                    franchise.getBranchIds().add(savedBranch.getId());
+                                                    return franchise;
+                                                })
+                                                .flatMap(franchiseRepository::save)
+                                ).thenReturn(franchise)
                 )
                 .map(updatedFranchise -> buildResponse(HttpStatus.CREATED, Constants.BRANCH_CREATED_SUCCESSFULLY, updatedFranchise))
                 .onErrorResume(ErrorHandlerUtils::handleError);

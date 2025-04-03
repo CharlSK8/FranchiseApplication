@@ -17,6 +17,4 @@ public class BranchDTO {
     @Schema(description = "Name of the branch", example = "Downtown Branch")
     private String name;
 
-    @Schema(description = "List of products available in the branch")
-    private List<ProductDTO> products;
 }
