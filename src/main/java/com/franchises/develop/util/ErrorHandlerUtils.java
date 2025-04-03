@@ -17,7 +17,6 @@ public class ErrorHandlerUtils {
     private static final Map<Class<? extends Throwable>, HttpStatus> ERROR_MAPPINGS = Map.of(
             DuplicateKeyException.class, HttpStatus.CONFLICT,
             ResourceNotFoundException.class, HttpStatus.NOT_FOUND,
-            BranchAlreadyExistsException.class, HttpStatus.CONFLICT,
             BranchNotFoundException.class, HttpStatus.NOT_FOUND,
             BranchNameAlreadyUpToDateException.class, HttpStatus.BAD_REQUEST,
             ProductNotFoundException.class, HttpStatus.NOT_FOUND,

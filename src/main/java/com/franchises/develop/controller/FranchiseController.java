@@ -77,6 +77,28 @@ public class FranchiseController {
                         .status(responseDTO.getCode())
                         .body(responseDTO));
     }
+
+    /**
+     * Updates the name of a branch within a specific franchise.
+     *
+     * @param franchiseId                The unique identifier of the franchise that owns the branch.
+     * @param branchUpdateNameRequestDTO The request body containing the branch ID and the new name.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing a {@link ResponseDTO}
+     *         with the updated franchise details or an error response if the operation fails.
+     */
+    @PutMapping("/{franchiseId}/name")
+    @Operation(
+            summary = "Update branch name in a franchise",
+            description = "Updates the name of a branch within a franchise based on the provided franchise ID and branch update details.")
+    public Mono<ResponseEntity<ResponseDTO<Franchise>>> updateBranchName(
+            @PathVariable String franchiseId,
+            @RequestBody BranchUpdateNameRequestDTO branchUpdateNameRequestDTO) {
+        return franchiseService.updateBranchName(franchiseId, branchUpdateNameRequestDTO)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
+
     /**
      * Retrieves the products with the highest stock in each branch of a specific franchise.
      *

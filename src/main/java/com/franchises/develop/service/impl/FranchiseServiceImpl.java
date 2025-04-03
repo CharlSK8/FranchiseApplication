@@ -29,6 +29,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class FranchiseServiceImpl implements IFranchiseService {
+
     private final FranchiseRepository franchiseRepository;
     private final BranchRepository branchRepository;
     private final IFranchiseMapper franchiseMapper;
@@ -108,6 +109,36 @@ public class FranchiseServiceImpl implements IFranchiseService {
     }
 
     /**
+     * Updates the name of a branch within a franchise.
+     *
+     * @param franchiseId The unique identifier of the franchise that owns the branch.
+     * @param requestDTO  The request containing the branch ID and the new name.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated franchise details
+     *         with the renamed branch, or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Franchise>> updateBranchName(String franchiseId, BranchUpdateNameRequestDTO requestDTO) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException(franchiseId)))
+                .flatMap(franchise -> {
+                    if (!franchise.getBranchIds().contains(requestDTO.getId())) {
+                        return Mono.error(new BranchNotFoundException("Branch not found with ID: " + requestDTO.getId()));
+                    }
+                    return branchRepository.findById(requestDTO.getId())
+                            .switchIfEmpty(Mono.error(new BranchNotFoundException("Branch not found with ID: " + requestDTO.getId())))
+                            .flatMap(branch -> {
+                                if (branch.getName().equalsIgnoreCase(requestDTO.getNewName())){
+                                    return Mono.error(new BranchNameAlreadyUpToDateException(requestDTO.getId(), requestDTO.getNewName()));
+                                }
+                                branch.setName(requestDTO.getNewName());
+                                return branchRepository.save(branch);
+                            })
+                            .thenReturn(franchise);
+                })
+                .map(franchise -> buildResponse(HttpStatus.OK, Constants.BRANCH_UPDATED_SUCCESSFULLY, franchise))
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
+
     /**
      * Retrieves the products with the highest stock for each branch within a franchise.
      *
@@ -158,4 +189,5 @@ public class FranchiseServiceImpl implements IFranchiseService {
                 .response(data)
                 .build();
     }
+
 }
