@@ -79,6 +79,35 @@ public class BranchServiceImpl implements IBranchService {
                 })
                 .onErrorResume(ErrorHandlerUtils::handleError);
     }
+
+    /**
+     * Updates the stock of a specific product in a given branch.
+     *
+     * @param branchId  The unique identifier of the branch where the product stock will be updated.
+     * @param productId The unique identifier of the product whose stock will be modified.
+     * @param newStock  The new stock quantity to be assigned to the product.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated product details
+     *         or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Product>> updateProductStock(String branchId, String productId, int newStock) {
+        return branchRepository.findById(branchId)
+                .switchIfEmpty(Mono.error(new BranchNotFoundException(branchId)))
+                .flatMap(branch -> {
+                    if (!branch.getProductsId().contains(productId)) {
+                        return Mono.error(new ProductNotFoundException(productId));
+                    }
+                    return productRepository.findById(productId)
+                            .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
+                            .flatMap(product -> {
+                                product.setStock(newStock);
+                                return productRepository.save(product)
+                                        .map(updatedProduct -> buildResponse(HttpStatus.OK, Constants.PRODUCT_STOCK_UPDATED_SUCCESSFULLY, updatedProduct));
+                            });
+                })
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
+
     /**
      * Builds a standardized response object.
      *
