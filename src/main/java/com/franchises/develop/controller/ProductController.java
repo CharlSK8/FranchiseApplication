@@ -15,4 +15,12 @@ import reactor.core.publisher.Mono;
 @RequestMapping("api/v1/products")
 @Tag(name = "Products Controller", description = "Endpoints for managing products")
 public class ProductController {
+    @PutMapping("/{productId}/name")
+    @Operation(summary = "Update product name", description = "Updates the name of an existing product.")
+    public Mono<ResponseEntity<ResponseDTO<Product>>    > updateProductName(@PathVariable String productId, @RequestParam String newName) {
+        return productService.updateProductName(productId, newName)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
 }
