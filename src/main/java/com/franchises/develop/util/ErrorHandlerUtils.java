@@ -21,7 +21,8 @@ public class ErrorHandlerUtils {
             BranchNameAlreadyUpToDateException.class, HttpStatus.BAD_REQUEST,
             ProductNotFoundException.class, HttpStatus.NOT_FOUND,
             ProductAlreadyExistsException.class, HttpStatus.CONFLICT,
-            ProductNameAlreadyUpToDateException.class, HttpStatus.BAD_REQUEST
+            ProductNameAlreadyUpToDateException.class, HttpStatus.BAD_REQUEST,
+            BranchNameAlreadyExistsException.class, HttpStatus.BAD_REQUEST
     );
 
     /**
