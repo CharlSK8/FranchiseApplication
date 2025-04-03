@@ -55,6 +55,30 @@ public class BranchServiceImpl implements IBranchService {
                 )
                 .onErrorResume(ErrorHandlerUtils::handleError);
     }
+
+    /**
+     * Removes a product from a specific branch.
+     *
+     * @param branchId  The unique identifier of the branch from which the product will be removed.
+     * @param productId The unique identifier of the product to be removed.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated branch details
+     *         or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Branch>> removeProductFromBranch(String branchId, String productId) {
+        return branchRepository.findById(branchId)
+                .switchIfEmpty(Mono.error(new BranchNotFoundException(branchId)))
+                .flatMap(branch -> {
+                    if (!branch.getProductsId().contains(productId)) {
+                        return Mono.error(new ProductNotFoundException(productId));
+                    }
+
+                    branch.getProductsId().remove(productId);
+                    return branchRepository.save(branch)
+                            .map(updatedBranch -> buildResponse(HttpStatus.OK, Constants.PRODUCT_REMOVED_SUCCESSFULLY, updatedBranch));
+                })
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
     /**
      * Builds a standardized response object.
      *
