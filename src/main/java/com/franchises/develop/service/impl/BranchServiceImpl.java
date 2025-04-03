@@ -21,4 +21,38 @@ import reactor.core.publisher.Mono;
 @Service
 @AllArgsConstructor
 public class BranchServiceImpl implements IBranchService {
+
+    private final BranchRepository branchRepository;
+    private final ProductRepository productRepository;
+
+    /**
+     * Adds a product to a specific branch.
+     *
+     * @param branchId       The unique identifier of the branch where the product will be added.
+     * @param productRequest The request containing the details of the product to be added.
+     * @return A {@link Mono} emitting a {@link ResponseDTO} containing the updated branch details
+     *         or an error response if the operation fails.
+     */
+    @Override
+    public Mono<ResponseDTO<Branch>> addProductToBranch(String branchId, ProductRequestDTO productRequest) {
+        return branchRepository.findById(branchId)
+                .switchIfEmpty(Mono.error(new BranchNotFoundException(branchId)))
+                .flatMap(branch ->
+                        productRepository.findByNameIgnoreCase(productRequest.getName())
+                                .switchIfEmpty(productRepository.save(Product.builder()
+                                        .name(productRequest.getName())
+                                        .stock(productRequest.getStock())
+                                        .build()))
+                                .flatMap(product -> {
+                                    if (branch.getProductsId().contains(product.getId())) {
+                                        return Mono.error(new ProductAlreadyExistsException(productRequest.getName()));
+                                    }
+
+                                    branch.getProductsId().add(product.getId());
+                                    return branchRepository.save(branch)
+                                            .map(savedBranch -> buildResponse(HttpStatus.CREATED, Constants.PRODUCT_CREATED_SUCCESSFULLY, savedBranch));
+                                })
+                )
+                .onErrorResume(ErrorHandlerUtils::handleError);
+    }
 }

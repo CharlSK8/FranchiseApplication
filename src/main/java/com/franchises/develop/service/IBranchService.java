@@ -7,4 +7,5 @@ import com.franchises.develop.model.Product;
 import reactor.core.publisher.Mono;
 
 public interface IBranchService {
+    Mono<ResponseDTO<Branch>> addProductToBranch(String branchId, ProductRequestDTO productRequest);
 }
