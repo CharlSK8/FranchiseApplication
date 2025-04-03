@@ -60,4 +60,22 @@ public class FranchiseController {
                         .status(responseDTO.getCode())
                         .body(responseDTO));
     }
+    /**
+     * Retrieves the products with the highest stock in each branch of a specific franchise.
+     *
+     * @param franchiseId The unique identifier of the franchise for which the highest stock per branch is retrieved.
+     * @return A {@link Mono} emitting a {@link ResponseEntity} containing a {@link ResponseDTO}
+     *         with a list of {@link ProductWithBranchDTO}, representing the products with the highest stock per branch,
+     *         or an error response if the operation fails.
+     */
+    @GetMapping("/{franchiseId}/branches/highest-stock")
+    @Operation(summary = "Find product with highest stock per branch",
+            description = "Returns a list of products (with the highest stock) for each branch of the given franchise.")
+    public Mono<ResponseEntity<ResponseDTO<List<ProductWithBranchDTO>>>> getHighestStockPerBranch(
+            @PathVariable String franchiseId) {
+        return franchiseService.getProductsWithMaxStockByBranch(franchiseId)
+                .map(responseDTO -> ResponseEntity
+                        .status(responseDTO.getCode())
+                        .body(responseDTO));
+    }
 }
