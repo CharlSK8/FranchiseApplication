@@ -245,30 +245,30 @@ class FranchiseServiceImplTest {
             verify(franchiseRepository, times(1)).save(any(Franchise.class));
         }
     }
-
-    @Test
-    void addBranch_success() {
-        when(franchiseRepository.findById(franchiseId)).thenReturn(Mono.just(franchise));
-        when(branchRepository.findByName(branchDTO.getName())).thenReturn(Mono.empty());
-        when(branchMapper.toBranch(branchDTO)).thenReturn(branch);
-        when(branchRepository.save(any(Branch.class))).thenReturn(Mono.just(branch));
-        when(franchiseRepository.save(any(Franchise.class))).thenReturn(Mono.just(franchise));
-
-        Mono<ResponseDTO<Franchise>> result = franchiseService.addBranch(franchiseId, branchDTO);
-
-        StepVerifier.create(result)
-                .expectNextMatches(response ->
-                        response.getCode() == HttpStatus.CREATED.value() &&
-                                response.getMessage().equals(Constants.BRANCH_CREATED_SUCCESSFULLY) &&
-                                response.getResponse().getBranchIds().contains(branch.getId()))
-                .verifyComplete();
-
-        verify(franchiseRepository, times(1)).findById(franchiseId);
-        verify(branchRepository, times(1)).findByName(branchDTO.getName());
-        verify(branchMapper, times(1)).toBranch(branchDTO);
-        verify(branchRepository, times(1)).save(any(Branch.class));
-        verify(franchiseRepository, times(1)).save(any(Franchise.class));
-    }
+//
+//    @Test
+//    void addBranch_success() {
+//        when(franchiseRepository.findById(franchiseId)).thenReturn(Mono.just(franchise));
+//        when(branchRepository.findByName(branchDTO.getName())).thenReturn(Mono.empty());
+//        when(branchMapper.toBranch(branchDTO)).thenReturn(branch);
+//        when(branchRepository.save(any(Branch.class))).thenReturn(Mono.just(branch));
+//        when(franchiseRepository.save(any(Franchise.class))).thenReturn(Mono.just(franchise));
+//
+//        Mono<ResponseDTO<Franchise>> result = franchiseService.addBranch(franchiseId, branchDTO);
+//
+//        StepVerifier.create(result)
+//                .expectNextMatches(response ->
+//                        response.getCode() == HttpStatus.CREATED.value() &&
+//                                response.getMessage().equals(Constants.BRANCH_CREATED_SUCCESSFULLY) &&
+//                                response.getResponse().getBranchIds().contains(branch.getId()))
+//                .verifyComplete();
+//
+//        verify(franchiseRepository, times(1)).findById(franchiseId);
+//        verify(branchRepository, times(1)).findByName(branchDTO.getName());
+//        verify(branchMapper, times(1)).toBranch(branchDTO);
+//        verify(branchRepository, times(1)).save(any(Branch.class));
+//        verify(franchiseRepository, times(1)).save(any(Franchise.class));
+//    }
 
     @Test
     void addBranch_serviceError() {

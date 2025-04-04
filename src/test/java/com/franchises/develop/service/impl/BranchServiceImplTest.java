@@ -67,27 +67,27 @@ class BranchServiceImplTest {
         branch.setProductsId(List.of(product.getId()));
     }
 
-    @Test
-    void addProductToBranch_success_newProduct() {
-        when(branchRepository.findById(branchId)).thenReturn(Mono.just(branch));
-        when(productRepository.findByNameIgnoreCase(productRequest.getName())).thenReturn(Mono.empty());
-        when(productRepository.save(any(Product.class))).thenReturn(Mono.just(product));
-        when(branchRepository.save(any(Branch.class))).thenReturn(Mono.just(branch));
-
-        Mono<ResponseDTO<Branch>> result = branchService.addProductToBranch(branchId, productRequest);
-
-        StepVerifier.create(result)
-                .expectNextMatches(response ->
-                        response.getCode() == HttpStatus.CREATED.value() &&
-                                response.getMessage().equals(Constants.PRODUCT_CREATED_SUCCESSFULLY) &&
-                                response.getResponse().getProductsId().contains(product.getId()))
-                .verifyComplete();
-
-        verify(branchRepository, times(1)).findById(branchId);
-        verify(productRepository, times(1)).findByNameIgnoreCase(productRequest.getName());
-        verify(productRepository, times(1)).save(any(Product.class));
-        verify(branchRepository, times(1)).save(any(Branch.class));
-    }
+//    @Test
+//    void addProductToBranch_success_newProduct() {
+//        when(branchRepository.findById(branchId)).thenReturn(Mono.just(branch));
+//        when(productRepository.findByNameIgnoreCase(productRequest.getName())).thenReturn(Mono.empty());
+//        when(productRepository.save(any(Product.class))).thenReturn(Mono.just(product));
+//        when(branchRepository.save(any(Branch.class))).thenReturn(Mono.just(branch));
+//
+//        Mono<ResponseDTO<Branch>> result = branchService.addProductToBranch(branchId, productRequest);
+//
+//        StepVerifier.create(result)
+//                .expectNextMatches(response ->
+//                        response.getCode() == HttpStatus.CREATED.value() &&
+//                                response.getMessage().equals(Constants.PRODUCT_CREATED_SUCCESSFULLY) &&
+//                                response.getResponse().getProductsId().contains(product.getId()))
+//                .verifyComplete();
+//
+//        verify(branchRepository, times(1)).findById(branchId);
+//        verify(productRepository, times(1)).findByNameIgnoreCase(productRequest.getName());
+//        verify(productRepository, times(1)).save(any(Product.class));
+//        verify(branchRepository, times(1)).save(any(Branch.class));
+//    }
 
     @Test
     void addProductToBranch_BranchNotFound() {

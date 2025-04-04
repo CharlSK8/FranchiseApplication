@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Plantilla DocumentDB
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: ID de la VPC donde se desplegará el clúster de DocumentDB.
+  Subnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet 1
+  Subnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet 2
+  DBUsername:
+    Type: String
+    NoEcho: true
+    Description: Nombre de usuario administrador para DocumentDB.
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Contraseña para el usuario administrador.
+
+Resources:
+  DocumentDBCluster:
+    Type: AWS::DocDB::DBCluster
+    Properties:
+      DBClusterIdentifier: franchise-db
+      EngineVersion: "5.0"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      VpcSecurityGroupIds:
+        - !Ref DocumentDBSecurityGroup
+      DBSubnetGroupName: !Ref DocumentDBSubnetGroup
+
+  DocumentDBInstance:
+    Type: AWS::DocDB::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref DocumentDBCluster
+      DBInstanceClass: db.t4g.medium
+      AutoMinorVersionUpgrade: true
+
+  DocumentDBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group para DocumentDB
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+
+  DocumentDBSubnetGroup:
+    Type: AWS::DocDB::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet Group para DocumentDB
+      SubnetIds:
+        - !Ref Subnet1
+        - !Ref Subnet2
