@@ -4,7 +4,6 @@ import com.franchises.develop.dto.request.ProductRequestDTO;
 import com.franchises.develop.dto.response.ResponseDTO;
 import com.franchises.develop.exception.handler.BranchNotFoundException;
 import com.franchises.develop.exception.handler.ProductAlreadyExistsException;
-import com.franchises.develop.exception.handler.ProductNameAlreadyUpToDateException;
 import com.franchises.develop.exception.handler.ProductNotFoundException;
 import com.franchises.develop.model.Branch;
 import com.franchises.develop.model.Product;
