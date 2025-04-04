@@ -112,6 +112,45 @@ A continuación se listan algunos de los endpoints principales de la API:
     docker run --rm --name franchise-app -p 8090:8090 franchise-image
     ```
 
+# Despliegue de Amazon DocumentDB con AWS CloudFormation
+
+Esta sección explica cómo desplegar una base de datos **Amazon DocumentDB** utilizando la plantilla de AWS CloudFormation nombrada **documentdb.yml**.
+
+## Requisitos Previos
+
+Antes de ejecutar el despliegue, asegúrate de contar con:
+
+- Una VPC configurada.
+- Al menos dos subnets públicas o privadas.
+- AWS CLI instalada y configurada con credenciales válidas.
+- La plantilla YAML (`documentdb.yaml`) correctamente estructurada.
+
+## Parámetros de la plantilla
+
+| Parámetro   | Descripción                                                        |
+|-------------|--------------------------------------------------------------------|
+| `VpcId`     | ID de la VPC donde se desplegará el clúster de DocumentDB.         |
+| `Subnet1`   | ID de la primera subnet.                                           |
+| `Subnet2`   | ID de la segunda subnet.                                           |
+| `DBUsername`| Nombre de usuario administrador para DocumentDB.                   |
+| `DBPassword`| Contraseña para el usuario administrador.                          |
+
+## Comando de despliegue
+
+Ejecuta el siguiente comando para crear el stack de CloudFormation:
+
+```bash
+aws cloudformation create-stack \
+  --stack-name documentdb-stack \
+  --template-body file://documentdb.yml \
+  --parameters \
+      ParameterKey=VpcId,ParameterValue=vpc-xxxxxxxx \
+      ParameterKey=Subnet1,ParameterValue=subnet-xxxxxxxx \
+      ParameterKey=Subnet2,ParameterValue=subnet-yyyyyyyy \
+      ParameterKey=DBUsername,ParameterValue=username \
+      ParameterKey=DBPassword,ParameterValue=password
+```
+
 ## Contribución
 
 Si deseas contribuir a este proyecto, por favor sigue los siguientes pasos:
