@@ -169,7 +169,7 @@ public class FranchiseServiceImpl implements IFranchiseService {
      * @return A {@link Mono} emitting the {@link Product} with the highest stock in the specified branch,
      *         or an empty {@link Mono} if no product is found.
      */
-    private Mono<Product> getProductWithMaxStock(String sucursalId) {
+    Mono<Product> getProductWithMaxStock(String sucursalId) {
         return branchRepository.findById(sucursalId)
                 .flatMapMany(sucursal -> Flux.fromIterable(sucursal.getProductsId()))
                 .flatMap(productRepository::findById)
